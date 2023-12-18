@@ -1,4 +1,4 @@
-from .models import Task
+from .models import Task, Category
 from rest_framework import serializers
 from django.contrib.auth.models import User
 
@@ -30,11 +30,23 @@ class LoginSerializer(serializers.Serializer):
 
 class TaskSerializer(serializers.ModelSerializer):
   user = serializers.ReadOnlyField(source='user.username')
+  category= serializers.StringRelatedField(source='category.name', read_only=True)
+  date_created = serializers.SerializerMethodField()
   
   class Meta:
     model = Task
-    fields = ['id', 'title',]
+    fields = '__all__'
   
   def create(self, validated_data):
     validated_data['user'] = self.context['request'].user
     return super().create(validated_data)
+  
+  def get_date_created(self, obj):
+    return obj.date_created.strftime('%b %d, %Y')
+    
+class CategorySerializer(serializers.ModelSerializer):
+  user = serializers.ReadOnlyField(source='user.username')
+  
+  class Meta:
+    model = Category
+    fields = '__all__'

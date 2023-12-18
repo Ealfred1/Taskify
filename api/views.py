@@ -1,12 +1,13 @@
 from django.shortcuts import render
 from django.contrib.auth import authenticate
-from .models import Task
+from .models import Task, Category
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.generics import *
 from .serializers import *
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from .permissions import IsOwnerOrReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
@@ -56,10 +57,29 @@ class UserLoginView(APIView):
 			'data': serializer.errors
 		})
 
-class TaskList(ListCreateAPIView):
+class TaskListView(ListCreateAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        if self.request.user.is_authenticated:
+            return Task.objects.filter(user=self.request.user)
+        else:
+            return Task.objects.none()
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+class TaskDetailView(RetrieveUpdateDestroyAPIView):
+    queryset = Task.objects.all()
+    serializer_class = TaskSerializer
+
+class CategoryListView(ListCreateAPIView):
+  queryset = Category.objects.all()
+  serializer_class = CategorySerializer
+  permission_classes = [IsAuthenticated]
+  
+  def perform_create(self, serializer):
+    serializer.save(user=self.request.user)
+
