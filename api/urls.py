@@ -11,5 +11,7 @@ urlpatterns = [
   
   path('tasks/', TaskListView.as_view()),
   path('tasks/<int:pk>', TaskDetailView.as_view()),
+  path('tasks/completed/<int:pk>', TaskCompleted.as_view()),
   path('categories/', CategoryListView.as_view()),
+  path('categories/<int:pk>', CategoryDetailView.as_view()),
 ]
