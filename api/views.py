@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.db.models import Count
 from rest_framework import status
 from django.contrib.auth import authenticate
 from .models import Task, Category
@@ -58,51 +59,73 @@ class UserLoginView(APIView):
 			'data': serializer.errors
 		})
 
+class DashboardView(APIView):
+  permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+
+  def get(self, request, *args, **kwargs):
+    # Retrieve categories with task counts
+    categories = Category.objects.filter(user=request.user).annotate(task_count=Count('task'))
+    categories_serialized = CategorySerializer(categories, many=True)
+
+    # Retrieve recent tasks
+    recent_tasks = Task.objects.filter(user=request.user).order_by('-date_created')[:5]
+    recent_tasks_serialized = TaskSerializer(recent_tasks, many=True)
+
+    # Get counts of completed and pending tasks
+    completed_tasks_count = Task.objects.filter(user=request.user, completed=True).count()
+    pending_tasks_count = Task.objects.filter(user=request.user, completed=False).count()
+
+    # Prepare summary statistics
+    summary_stats = {
+        'total_categories': categories.count(),
+        'categories': categories_serialized.data,
+        'recent_tasks': recent_tasks_serialized.data,
+        'completed_tasks': completed_tasks_count,
+        'pending_tasks': pending_tasks_count,
+    }
+
+    return Response(summary_stats, status=status.HTTP_200_OK)
+
 class TaskListView(ListCreateAPIView):
-    queryset = Task.objects.all()
-    serializer_class = TaskSerializer
-    permission_classes = [IsAuthenticated]
-    
-    def get_queryset(self):
-        if self.request.user.is_authenticated:
-            return Task.objects.filter(user=self.request.user)
-        else:
-            return Task.objects.none()
-    
-    def create(self, request, *args, **kwargs):
-      title = request.data.get('title')
-      category_id = request.data.get('category')
+  queryset = Task.objects.all()
+  serializer_class = TaskSerializer
+  permission_classes = [IsAuthenticated]
 
-      default_category = None
-      if not category_id:
-        try:
-          default_category = Category.objects.get(name='Uncategorized', user=request.user)
-        except Category.DoesNotExist:
-          default_category = Category.objects.create(name='Uncategorized', user=request.user)
+  def get_queryset(self):
+    if self.request.user.is_authenticated:
+      return Task.objects.filter(user=self.request.user)
+    else:
+      return Task.objects.none()
 
+  def create(self, request, *args, **kwargs):
+    category_id = request.data.get('category')
+
+    if category_id:
+      category = Category.objects.get(name=category_id, user=request.user)
       serializer = self.get_serializer(data=request.data)
       serializer.is_valid(raise_exception=True)
-      
-      if default_category:
-        serializer.validated_data['category'] = default_category
-      self.perform_create(serializer)
-      headers = self.get_success_headers(serializer.data)
+      serializer.save(user=request.user, category=category)
+    else:
+      default_category, created = Category.objects.get_or_create(name='Uncategorized', user=request.user)
+      serializer = self.get_serializer(data=request.data)
+      serializer.is_valid(raise_exception=True)
+      serializer.save(user=request.user, category=default_category)
 
-    # Get the total tasks and count of incomplete tasks for the user
-      total_tasks = Task.objects.filter(user=request.user).count()
-      incomplete_tasks = Task.objects.filter(user=request.user, completed=False).count()
-    
-      response_data = {
-        'task': serializer.data,
-        'total_tasks': total_tasks,
-        'incomplete_tasks': incomplete_tasks
-      }
+    headers = self.get_success_headers(serializer.data)
 
-      return Response(response_data, status=status.HTTP_201_CREATED, headers=headers)
-    
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+    total_tasks = Task.objects.filter(user=request.user).count()
+    incomplete_tasks = Task.objects.filter(user=request.user, completed=False).count()
 
+    response_data = {
+      'task': serializer.data,
+      'total_tasks': total_tasks,
+      'incomplete_tasks': incomplete_tasks
+    }
+
+    return Response(response_data, status=status.HTTP_201_CREATED, headers=headers)
+
+  def perform_create(self, serializer):
+    serializer.save(user=self.request.user)
 class TaskDetailView(RetrieveUpdateDestroyAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
@@ -119,6 +142,22 @@ class CategoryDetailView(RetrieveUpdateDestroyAPIView):
   queryset = Category.objects.all()
   serializer_class = CategorySerializer
   permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+
+  def get_serializer_context(self):
+    context = super().get_serializer_context()
+    context.update({'request': self.request})
+    return context
+
+  def retrieve(self, request, *args, **kwargs):
+    instance = self.get_object()
+    tasks = instance.task_set.all()  # Get tasks related to this category
+    tasks_serializer = TaskSerializer(tasks, many=True)
+
+    serialized_data = self.get_serializer(instance).data
+    serialized_data['task_count'] = tasks.count()
+    serialized_data['tasks'] = tasks_serializer.data
+
+    return Response(serialized_data)
 
 class TaskCompleted(APIView):
     def post(self, request, pk):
