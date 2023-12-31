@@ -50,9 +50,7 @@ class UserLoginView(APIView):
 					#'user': f'{user.first_name} {user.last_name}',
 					'user': user_serializer.data
 				})
-			return Response({
-				'message': 'Invalid Credentials'
-			})
+			return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
 		
 		return Response({
 			'message': 'Something went wrong',
