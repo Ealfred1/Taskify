@@ -1,4 +1,4 @@
-from .models import Task, Category
+from .models import Task, Category, UserProfile
 from rest_framework import serializers
 from django.contrib.auth.models import User
 
@@ -50,3 +50,16 @@ class CategorySerializer(serializers.ModelSerializer):
   class Meta:
     model = Category
     fields = '__all__'
+
+class UserProfileSerializer(serializers.ModelSerializer):
+
+	class Meta:
+		model = UserProfile
+		fields = ['bio', 'profile_picture']
+
+class UserProfileDetailSerializer(serializers.ModelSerializer):
+    user = UserRegistrationSerializer()
+
+    class Meta:
+        model = UserProfile
+        fields = '__all__'

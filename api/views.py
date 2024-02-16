@@ -18,10 +18,13 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 @api_view(['GET'])
 def test_response(request):
-	response = {
-		'Packages': 'package1'
-	}
-	return Response(response)
+  user_instance = User.objects.get(username='Eric')
+  user_profile = user_instance.user_profile
+  print(user_profile.bio)
+  response = {
+  		'Packages': 'package1'
+  }
+  return Response(response)
 
 
 # User Registration view
@@ -161,6 +164,27 @@ class TaskCompleted(APIView):
     def post(self, request, pk):
         task = get_object_or_404(Task, pk=pk)
         task.completed = not task.completed
+        task.status = 'completed' if task.completed else 'in_progress'
         task.save()
         serializer = TaskSerializer(task)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class ProfileCreateView(APIView):
+  permission_classes = [IsAuthenticated]
+
+  def post(self, request):
+    request.date['user'] = request.user.id
+
+    serializer = UserProfileSerializer(data=request.data)
+    if serializer.is_valid():
+      serializer.save()
+      return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class UserProfileDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user_profile = UserProfile.objects.get(user=request.user)
+        serializer = UserProfileDetailSerializer(user_profile)
         return Response(serializer.data, status=status.HTTP_200_OK)

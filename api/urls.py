@@ -15,4 +15,6 @@ urlpatterns = [
   path('tasks/completed/<int:pk>', TaskCompleted.as_view()),
   path('categories/', CategoryListView.as_view()),
   path('categories/<int:pk>', CategoryDetailView.as_view()),
+  path('profile/create', ProfileCreateView.as_view()),
+  path('user/profile', UserProfileDetailView.as_view()),
 ]
