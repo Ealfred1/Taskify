@@ -150,7 +150,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
-    "https:taskify-fr.vercel.app"  # Add your frontend URL here
+    "https://taskify-fr.vercel.app"  # Add your frontend URL here
 ]
 
 CORS_ALLOW_CREDENTIALS = True
