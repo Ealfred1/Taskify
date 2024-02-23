@@ -30,6 +30,7 @@ class LoginSerializer(serializers.Serializer):
 
 class TaskSerializer(serializers.ModelSerializer):
   user = serializers.ReadOnlyField(source='user.username')
+  assigned_to = serializers.ReadOnlyField(source='user.username')
   category= serializers.StringRelatedField(source='category.name', read_only=True)
   date_created = serializers.SerializerMethodField()
   
@@ -59,6 +60,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 class UserProfileDetailSerializer(serializers.ModelSerializer):
     user = UserRegistrationSerializer()
+    assigned_to = serializers.ReadOnlyField(source='user.username')
 
     class Meta:
         model = UserProfile
