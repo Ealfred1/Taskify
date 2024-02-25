@@ -15,6 +15,8 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 from datetime import timedelta
+import cloudinary
+import cloudinary_storage
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -186,3 +188,31 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+cloudinary.config ( 
+  cloud_name = "dwlggtcty", 
+  api_key = "655848161224789", 
+  api_secret = "qcMLcEYoHA9GmOKlBATlttAamCM" 
+)
+
+
+# Cloudinary storage settings
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': 'dwlggtcty',
+    'API_KEY': '655848161224789',
+    'API_SECRET': 'qcMLcEYoHA9GmOKlBATlttAamCM',
+    'SECURE': True,  # Use HTTPS
+}
+
+# Use Cloudinary for default file storage
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+# Cloudinary image settings
+CLOUDINARY = {
+    'CLOUD_NAME': 'dwlggtcty',
+    'API_KEY': '655848161224789',
+    'API_SECRET': 'qcMLcEYoHA9GmOKlBATlttAamCM',
+}
+
+DEFAULT_IMAGE_BACKEND = 'cloudinary'

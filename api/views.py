@@ -174,7 +174,7 @@ class ProfileCreateView(APIView):
   permission_classes = [IsAuthenticated]
 
   def post(self, request):
-    request.date['user'] = request.user.id
+    request.data['user'] = request.user.id
 
     serializer = UserProfileSerializer(data=request.data)
     if serializer.is_valid():
