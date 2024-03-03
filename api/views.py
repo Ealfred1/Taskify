@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.db.models import Count
 from rest_framework import status
 from django.contrib.auth import authenticate
-from .models import Task, Category
+from .models import Task, Category, UserProfile
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView

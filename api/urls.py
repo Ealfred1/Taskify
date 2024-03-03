@@ -7,7 +7,7 @@ urlpatterns = [
 	path('', test_response),
 	path('register/', UserRegistrationView.as_view()),
 	path('login/', UserLoginView.as_view()),
-  path('login/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('login/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
   
   path('dashboard/', DashboardView.as_view()),
   path('tasks/', TaskListView.as_view()),
