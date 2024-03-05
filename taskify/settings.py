@@ -184,8 +184,7 @@ MEDIA_URL = 'media/'
 
 MEDIA_ROOT = BASE_DIR / 'media'
 
-
-# MEDIA_URL = 'https://res.cloudinary.com/dwlggtcty/'
+MEDIA_URL = 'https://res.cloudinary.com/dwlggtcty/'
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # Default primary key field type
