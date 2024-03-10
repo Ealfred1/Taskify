@@ -47,10 +47,15 @@ class TaskSerializer(serializers.ModelSerializer):
     
 class CategorySerializer(serializers.ModelSerializer):
   user = serializers.ReadOnlyField(source='user.username')
+  task_count = serializers.SerializerMethodField()
   
   class Meta:
     model = Category
-    fields = '__all__'
+    fields = ['id', 'name', 'task_count', 'user']
+
+  def get_task_count(self, category):
+        # Retrieve the task count for the category
+        return category.task_set.count()
 
 class UserProfileSerializer(serializers.ModelSerializer):
 
