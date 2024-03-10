@@ -1,6 +1,7 @@
 asgiref
 certifi
 cloudinary
+cloudinary_storage
 distlib
 Django
 django-cors-headers
