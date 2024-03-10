@@ -76,6 +76,7 @@ class DashboardView(APIView):
     completed_tasks_count = Task.objects.filter(user=request.user, completed=True).count()
     pending_tasks_count = Task.objects.filter(user=request.user, completed=False).count()
 
+
     # Prepare summary statistics
     summary_stats = {
         'total_categories': categories.count(),
@@ -136,6 +137,12 @@ class CategoryListView(ListCreateAPIView):
   queryset = Category.objects.all()
   serializer_class = CategorySerializer
   permission_classes = [IsAuthenticated]
+
+  def get_queryset(self):
+    if self.request.user.is_authenticated:
+      return Category.objects.filter(user=self.request.user)
+    else:
+      return Category.objects.none()
   
   def perform_create(self, serializer):
     serializer.save(user=self.request.user)
