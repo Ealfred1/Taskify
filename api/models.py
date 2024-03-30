@@ -26,7 +26,6 @@ class Task(models.Model):
   STATUS_CHOICES = (
     ('todo', 'To-Do'),
     ('in_progress', 'In Progress'),
-    ('completed', 'Completed'),
   )
   
   title = models.CharField(max_length=100)
