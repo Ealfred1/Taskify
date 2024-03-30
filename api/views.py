@@ -86,6 +86,8 @@ class DashboardView(APIView):
         'recent_tasks': recent_tasks_serialized.data,
         'completed_tasks': completed_tasks_count,
         'pending_tasks': pending_tasks_count,
+        'task_todo': task_todo,
+        'task_in_progress': task_in_progress
     }
 
     return Response(summary_stats, status=status.HTTP_200_OK)
