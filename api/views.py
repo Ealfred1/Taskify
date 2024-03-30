@@ -75,8 +75,8 @@ class DashboardView(APIView):
     # Get counts of completed and pending tasks
     completed_tasks_count = Task.objects.filter(user=request.user, completed=True).count()
     pending_tasks_count = Task.objects.filter(user=request.user, completed=False).count()
-    task_in_progress = Task.object.filter(user=request.user, status="in_progress").count()
-    task_todo = Task.object.filter(user=request.user, status="todo").count()
+    task_in_progress = Task.objects.filter(user=request.user, status="in_progress").count()
+    task_todo = Task.objects.filter(user=request.user, status="todo").count()
 
 
     # Prepare summary statistics
