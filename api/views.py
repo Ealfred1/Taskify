@@ -173,7 +173,7 @@ class CategoryDetailView(RetrieveUpdateDestroyAPIView):
     return Response(serialized_data)
 
 class TaskCompleted(APIView):
-    def post(self, request, pk):
+    def get(self, request, pk):
         task = get_object_or_404(Task, pk=pk)
         task.completed = not task.completed
         task.status = 'completed' if task.completed else 'in_progress'
