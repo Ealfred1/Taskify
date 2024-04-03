@@ -37,6 +37,7 @@ class Task(models.Model):
   category = models.ForeignKey(Category, on_delete=models.CASCADE, blank=True, null=True)
   user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tasks')
   status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='todo')
+  reminder = models.TimeField(null=True, blank=True)
   assigned_to = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True, related_name='assigned_tasks')
   date_created = models.DateTimeField(auto_now_add=True)
 
