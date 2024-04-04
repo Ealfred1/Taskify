@@ -69,7 +69,7 @@ class DashboardView(APIView):
     categories_serialized = CategorySerializer(categories, many=True)
 
     # Retrieve recent tasks
-    recent_tasks = Task.objects.filter(user=request.user).order_by('-date_created')[:5]
+    recent_tasks = Task.objects.filter(user=request.user).order_by('-date_created')[:4]
     recent_tasks_serialized = TaskSerializer(recent_tasks, many=True)
 
     # Get counts of completed and pending tasks
