@@ -99,7 +99,7 @@ class TaskListView(ListCreateAPIView):
 
   def get_queryset(self):
     if self.request.user.is_authenticated:
-      return Task.objects.filter(user=self.request.user)
+      return Task.objects.filter(user=self.request.user).order_by("due_date")
     else:
       return Task.objects.none()
 
